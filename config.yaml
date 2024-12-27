@@ -1,0 +1,34 @@
+name: "PLC network monitor"
+description: "PLC Network addon will help you understand and control your PLC network"
+version: "0.2.0"
+slug: "plc_network"
+url: "https://github.com/urri34/plc_network"
+init: false
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+startup: services
+ingress: true
+ingress_port: 3434
+host_network: true
+
+services:
+- mqtt:need
+homeassistant_api: true
+
+options:
+  refresh: 60
+  interface: auto
+  debug: true
+schema:
+  refresh: int
+  interface: str
+  debug: bool
+
+map:
+  - type: homeassistant_config
+    read_only: False
+    path: /config
