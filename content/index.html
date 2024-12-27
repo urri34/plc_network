@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Xarxa PLC</title>
+  <script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+  <style>
+    #network {
+      width: 100%;
+      height: 500px;
+      border: 1px solid lightgray;
+    }
+  </style>
+</head>
+<body>
+  <h1>Xarxa PLC</h1>
+  <div id="network"></div>
+  <script>
+// Exemple de representació d'una xarxa en estrella amb Vis.js
+
+// Funció per carregar dades des d'un fitxer JSON
+async function loadNetworkData() {
+  try {
+    const response = await fetch('web.json'); // Substitueix amb el camí correcte al teu fitxer JSON
+    const jsonData = await response.json();
+
+    // Processar nodes i connexions des del fitxer JSON
+    const nodesData = jsonData.nodes.map(node => ({
+      id: node.id,
+      label: node.id,
+      group: node.group
+    }));
+
+    const edgesData = jsonData.links.map(link => ({
+      from: link.source,
+      to: link.target,
+      tx: link.tx,
+      rx: link.rx,
+      label: `TX: ${link.tx}\nRX: ${link.rx} Mbps`
+    }));
+
+    // Processar dades per calcular el color i el tamany dels nodes
+    const nodeSums = {};
+    edgesData.forEach(edge => {
+      const sum = edge.tx + edge.rx;
+      if (!nodeSums[edge.from]) nodeSums[edge.from] = 0;
+      if (!nodeSums[edge.to]) nodeSums[edge.to] = 0;
+      nodeSums[edge.from] += sum;
+      nodeSums[edge.to] += sum;
+    });
+
+    const getNodeColorAndSize = (sum) => {
+      if (sum > 200) {
+        return { color: "#2ECC71", size: 40 }; // Verd per a valors grans
+      } else if (sum > 100) {
+        return { color: "#F39C12", size: 30 }; // Taronja per a valors mitjans
+      } else {
+        return { color: "#E74C3C", size: 20 }; // Vermell per a valors baixos
+      }
+    };
+
+    const nodes = new vis.DataSet(nodesData.map(node => {
+      const { color, size } = getNodeColorAndSize(nodeSums[node.id] || 0);
+      return { ...node, color: { background: color }, size, shape: "dot", font: { size: 14, color: "#000" } };
+    }));
+
+    const edges = new vis.DataSet(edgesData);
+
+    // Creació del container per al gràfic
+    const container = document.getElementById("network");
+
+    // Configuració de la xarxa
+    const data = { nodes: nodes, edges: edges };
+    const options = {
+      nodes: {
+        font: {
+          size: 14,
+          color: "#000",
+        },
+        borderWidth: 2
+      },
+      edges: {
+        font: {
+          align: "middle"
+        },
+        color: "#848484",
+        arrows: {
+          to: { enabled: true, scaleFactor: 0.5 },
+        },
+        smooth: true
+      },
+      physics: {
+        enabled: true,
+        stabilization: { iterations: 100 },
+        barnesHut: {
+          gravitationalConstant: -30000,
+          centralGravity: 0.3,
+          springLength: 95,
+          springConstant: 0.04
+        }
+      }
+    };
+
+    // Inicialització de la xarxa
+    const network = new vis.Network(container, data, options);
+
+    // Configurar refresc automàtic si el camp 'reload' està present
+    if (jsonData.reload) {
+      const reloadInterval = parseInt(jsonData.reload, 10) * 1000; // Convertir a mil·lisegons
+      setTimeout(() => {
+        location.reload();
+      }, reloadInterval);
+    }
+  } catch (error) {
+    console.error("Error carregant el fitxer JSON:", error);
+  }
+}
+
+// Carregar les dades i inicialitzar la xarxa
+loadNetworkData();
+
+  </script>
+</body>
+</html>
