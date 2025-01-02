@@ -7,7 +7,7 @@ Home assistant addon under development
 PLC have no ip, so we need to talk to them thru the mac address. And that means that the computer where we are executing plc_network addon needs to be physically connected to the PLC (in case you run plc_network addon in a virtual machine, the host needs to be connected to the PLC).
 
 <p align="center">
-  <img src="https://github.com/urri34/MyPLCNetwork/blob/main/Diagram.jpg" />
+  <img src="https://github.com/urri34/MyPLCNetwork/blob/main/Diagram.jpg#" />
 </p>
 
 <p align="center">
