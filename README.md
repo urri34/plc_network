@@ -1,10 +1,8 @@
 # plc_network
 
-Home assistant addon 
+Home assistant addon under development
 
-## HW and physical dependencies:
-
-**This addon cannot be run anywhere, it has some <ins>physical</ins> restrictions**. 
+# **<<<This addon has some <ins>physical</ins> restrictions>>>**. 
 
 PLC have no ip, so we need to talk to them thru the mac address. And that means that the computer where we are executing plc_network addon needs to be physically connected to the PLC (in case you run plc_network addon in a virtual machine, the host needs to be connected to the PLC).
 
